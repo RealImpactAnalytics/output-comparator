@@ -17,8 +17,8 @@ class OutputComparator(val testDataHeader : Array[String],
 	val N_ERROR = 10 // maximum number of errors by column for the human readable report
 
 	// Compute the missing column
-	val missingTrustedColumn : Array[Int]  = columnDiff(trustedDataHeader, testDataHeader)
-	val missingTestColumn : Array[Int]  = columnDiff(testDataHeader, trustedDataHeader)
+	val missingTrustedColumn : Array[String]  = columnDiff(trustedDataHeader, testDataHeader)
+	val missingTestColumn : Array[String]  = columnDiff(testDataHeader, trustedDataHeader)
 
 	// Compute the column mapping trustedIndex -> testIndex
 	val columnMapping : Map[Int,Int] = columnMap(testDataHeader, trustedDataHeader)
@@ -72,11 +72,11 @@ class OutputComparator(val testDataHeader : Array[String],
 	}
 
 	/* 
-	 * Return a array which contains the index of the column that are in a but not in b
+	 * Return a array which contains the name of the column that are in a but not in b
 	 */ 
-	def columnDiff(a : Array[String], b : Array[String]) : Array[Int]= {
-		for ((h, i) <- a.zipWithIndex if !b.contains(h)) yield {
-			i
+	def columnDiff(a : Array[String], b : Array[String]) : Array[String]= {
+		for (h <- a if !b.contains(h)) yield {
+			h
 		}
 	}
 

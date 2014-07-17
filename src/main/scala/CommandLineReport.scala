@@ -5,9 +5,9 @@ object CommandLineReport extends TestResultReport {
 	def report(comparator : OutputComparator){
 
 		println("Trusted missing column :")
-		comparator.missingTrustedColumn.foreach(i => println(comparator.trustedDataHeader(i)))
+		comparator.missingTrustedColumn.foreach(h => println(h))
 		println("Test missing column :")
-		comparator.missingTestColumn.foreach(i => println(comparator.testDataHeader(i)))
+		comparator.missingTestColumn.foreach(h => println(h))
 
 		// Print the error report
 		comparator.columnErrorsPairs.foreach{ case (columnName, errors) =>
