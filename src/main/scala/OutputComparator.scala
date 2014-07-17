@@ -17,11 +17,11 @@ class OutputComparator(val testDataHeader : Array[String],
 	val N_ERROR = 10 // maximum number of errors by column for the human readable report
 
 	// Compute the missing column
-	val missingTrustedColumn = columnDiff(trustedDataHeader, testDataHeader)
-	val missingTestColumn = columnDiff(testDataHeader, trustedDataHeader)
+	val missingTrustedColumn : Array[Int]  = columnDiff(trustedDataHeader, testDataHeader)
+	val missingTestColumn : Array[Int]  = columnDiff(testDataHeader, trustedDataHeader)
 
-	// Compute the column mapping
-	val columnMapping = columnMap(testDataHeader, trustedDataHeader)
+	// Compute the column mapping trustedIndex -> testIndex
+	val columnMapping : Map[Int,Int] = columnMap(testDataHeader, trustedDataHeader)
 
 	// Compute the errors
 	val results = testData.join(trustedData).map {
@@ -30,13 +30,19 @@ class OutputComparator(val testDataHeader : Array[String],
 
 	// Aggregate the errors, each element of the array is the list of error for a column
 	// The list contain either only Ok or a N_ERROR errors
-	val synthethicTestResults = results.reduce{ (A, B) =>
+	// Not practical since we need to use columnMapping to find the name of the column
+	private val synthethicTestResults = results.reduce{ (A, B) =>
 		A.zip(B).map{
 			case (Ok :: Nil, Ok :: Nil) => Ok :: Nil
 			case (error, Ok :: Nil) => error
 			case (Ok :: Nil, error) => error
 			case (errorA, errorB) => (errorA ::: errorB).take(N_ERROR)
 		}
+	}
+
+	// Collection of pairs (columnName, errors)
+	val columnErrorsPairs = columnMapping.zip(synthethicTestResults).map{
+		case ((columnIndex,_), error) => (trustedDataHeader(columnIndex), error)
 	}
 
 	/*
@@ -74,51 +80,13 @@ class OutputComparator(val testDataHeader : Array[String],
 		}
 	}
 
-
-	// Print the error report
-	columnMapping.zip(synthethicTestResults).foreach{case ((trustedColumnIndex, _), errors) =>
-		val columnName = trustedDataHeader(trustedColumnIndex)
-		errors match {
-			case (Ok :: Nil) => println(s"column : $columnName is OK")
-			case errors => errors.foreach{
-				case e : Error => println(s"column : $columnName error : for id : ${e.id} the value is ${e.testValue} but it should be ${e.trustedValue}")
-			}
-		}
-	}
-
-	println("Trusted missing column :")
-	missingTrustedColumn.foreach(i => println(trustedDataHeader(i)))
-	println("Test missing column :")
-	missingTestColumn.foreach(i => println(testDataHeader(i)))
-
-	println("results : ")
-	// Print some results
-	results.take(10).foreach(_.zipWithIndex.foreach{
-		case (List(Ok), i) => println(s"column : ${testDataHeader(i)} OK")
-		case (List(Error(id, trustedValue, testValue, msg)), i) => println(msg)
-	})
-
 }
 
 object OutputComparator{
 
-	val separator = "," // for the csv files
-
-	// Consider the first column as the key
-	def columnSplit(line : String) : (String, Array[String]) = {
-		var s = line.split(separator)
-		(s.head, s.tail)
-	}
-
-	def getHeader(headerPath : String) : Array[String]={
-		sc.textFile(headerPath).first.split(separator).tail
-	}
-
-	def getData(dataPath : String) : org.apache.spark.rdd.RDD[(String, Array[String])] = {
-		sc.textFile(dataPath).map(columnSplit(_))
-	}
-
-
+	/*
+	 * The file must be cvs files and the separator by ","
+	 */ 
 	def apply(testDataHeaderPath: String,
 			testDataPath : String,
 			trustedDataHeaderPath : String,
@@ -141,5 +109,22 @@ object OutputComparator{
 			: OutputComparator ={
 		new OutputComparator(testDataHeader, trustedDataHeader, testData, trustedData)
 	}
+
+	val separator = "," // for the csv files
+
+	// Consider the first column as the key
+	def columnSplit(line : String) : (String, Array[String]) = {
+		var s = line.split(separator)
+		(s.head, s.tail)
+	}
+
+	def getHeader(headerPath : String) : Array[String]={
+		sc.textFile(headerPath).first.split(separator).tail
+	}
+
+	def getData(dataPath : String) : org.apache.spark.rdd.RDD[(String, Array[String])] = {
+		sc.textFile(dataPath).map(columnSplit(_))
+	}
+
 }
 
