@@ -1,10 +1,6 @@
 import OutputComparator._
 
-trait testResultReport {
-	def report(comparator : OutputComparator)
-}
-
-object CommandLineReport extends testResultReport {
+object CommandLineReport extends TestResultReport {
 
 	def report(comparator : OutputComparator){
 		// Print the error report
