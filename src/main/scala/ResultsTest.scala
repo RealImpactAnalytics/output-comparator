@@ -1,5 +1,5 @@
 import OutputComparator._
-import CommandLineReport._
+import report.CommandLineReport
 
 object ResultsTest {
 	def main(args: Array[String]){
