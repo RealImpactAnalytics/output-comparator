@@ -32,30 +32,30 @@ class ComparisonTest extends SetSpec {
 	}  
 
 	def test() {
-		describe("Check if they are missing column in the Trusted data"){
+		describe("[Check missing column in Trusted data] : "){
 				comparator.missingTrustedColumn.foreach(h => 
 					it(s"$h shouldn't be missing"){
 						assert(false)
 					})
 		}
 
-		describe("Check if they are missing column in the Test data"){
+		describe("[Check missing column in Test data] : "){
 				comparator.missingTestColumn.foreach(h => 
 					it(s"$h shouldn't be missing"){
 						assert(false)
 					})
 		}
 
-		describe("Verify the columns") { 
+		describe("[Check column value] : ") { 
 			// Print the error report
 			comparator.columnErrorsPairs.foreach{ case (columnName, errors) =>
 				errors match {
 					case (Ok :: Nil) => 
-						it(s"The column $columnName should be Ok"){
+						it(s"column $columnName is Ok"){
 						}
 					case errors => errors.foreach{
 						case e : Error => 
-							it(s"column : $columnName should be ok but for id: ${e.id} the value is ${e.testValue} but it should be ${e.trustedValue}"){
+							it(s"column $columnName should be ok but for id ${e.id} the value is ${e.testValue} and it should be ${e.trustedValue}"){
 								assert(false)
 							}
 					}
