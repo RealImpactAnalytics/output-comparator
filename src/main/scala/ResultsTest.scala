@@ -1,6 +1,3 @@
-import OutputComparator._
-import report.CommandLineReport
-
 object ResultsTest {
 	def main(args: Array[String]){
 		/*

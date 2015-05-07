@@ -1,5 +1,3 @@
-import OutputComparator._
-
 object CommandLineReport extends TestResultReport {
 
 	def report(comparator : OutputComparator){
