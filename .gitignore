@@ -1,5 +1,33 @@
-project/*
-target/*
+*.class
+*.log
 
-#Backup file
-*~
+# sbt specific
+bin
+target
+~*
+dist/*
+target/
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
+
+# Scala-IDE specific
+.scala_dependencies
+.cache
+.settings
+.project
+.classpath
+.idea
+
+# IntelliJ specific
+.idea/
+*.iml
+
+# Windows specific
+~*
+desktop.ini
+thumbs.db
+
+# MacOS specific
+.DS_Store
